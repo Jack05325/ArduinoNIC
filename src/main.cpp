@@ -16,12 +16,11 @@ int idDest = 3;
 int idDestRX = 3; // RX
 int idMitt;
 int idBroadcast = 15;
-int butt = 4;
-unsigned long long frame;
+std::bitset<16> frame;
+bitset<size_t maxBits> frame;
 
 void Rx();
 void Tx();
-long long checkFrame(long long frame);
 
 void setup()
 {
@@ -47,8 +46,6 @@ void loop()
   }
 }
 
-
-
 void Rx()
 {
   delayMicroseconds(Tbit + (Tbit / 2));
@@ -60,7 +57,7 @@ void Rx()
   }
   frame = hamming.checkFrameRicevuto(frame);
   frame = hamming.estraiDati(frame);
-  
+
   idDestRX = (unsigned int)frame >> 12;
   idMitt = (unsigned int)(frame << 4) >> 12;
   dato = (unsigned int)(frame << 8) >> 8;
