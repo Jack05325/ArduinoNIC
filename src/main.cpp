@@ -16,8 +16,8 @@ int idDest = 3;
 int idDestRX = 3; // RX
 int idMitt;
 int idBroadcast = 15;
-std::bitset<16> frame;
-bitset<size_t maxBits> frame;
+int butt = 4;
+long long frame;
 
 void Rx();
 void Tx();
