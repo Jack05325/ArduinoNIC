@@ -1,129 +1,122 @@
 #include <Arduino.h>
-#include <Hamming.h>
+#include "CRC16.h"
+#include "CRC.h"
+#include "CrcFastReverse.h"
 
-Hamming hamming;
+CRC16 crc;
 
-const int pullUP = 7;
-const int linea = 8;
-const int butt = 4;
+int pullUP = 7;
+int linea = 8;
+int start = 0;
+int stop = 1;
+int Tbit = 100;
 
-const int start = 0;
-const int stop = 1;
-const int Tbit = 100;
+int id = 5;      // "IP" del mittente
+char dato = 'a'; // TX
+int idDest = 5;
 
-const int id = 5; // ID del mittente
-char dato = 'a';  // Dato da trasmettere
-const int idDest = 3; // ID del destinatario
-const int idBroadcast = 15; // ID broadcast per tutti i nodi
-
-int idDestRX = 3; // ID destinatario ricevuto
-int idMitt;       // ID mittente ricevuto
-
-uint8_t frame[2]; // Frame da trasmettere
-int frameLength = 2;           // Lunghezza del frame in byte
+int idDestRX = 0; // RX
+int idMitt;
+int idBroadcast = 15;
+int butt = 4;
+uint8_t frame[4];
+const size_t frameLength = sizeof(frame);
+uint8_t frameRX[4];
 
 void Rx();
 void Tx();
 
-void setup() {
+void setup()
+{
   pinMode(linea, INPUT);
   pinMode(pullUP, OUTPUT);
-  pinMode(butt, INPUT_PULLUP);
-
   Serial.begin(9600);
+  pinMode(butt, INPUT_PULLUP);
   digitalWrite(linea, HIGH);
 }
 
-void loop() {
-  if (digitalRead(butt) == HIGH) {
-    if (digitalRead(linea) == LOW) {
-      Rx();
+void loop()
+{
+  while (digitalRead(butt) == HIGH)
+  {
+    if (digitalRead(linea) == LOW)
+    {
+      //Rx();
     }
-  } else if (digitalRead(linea) == HIGH) {
+  }
+  if (digitalRead(linea) == HIGH)
+  {
     Tx();
   }
 }
 
-void Rx() {
-  delayMicroseconds(Tbit + Tbit / 2);
+void Rx()
+{
+  delayMicroseconds(Tbit + (Tbit / 2));
 
-  for (int i = 0; i < frameLength; i++) {
-    frame[i] = 0;
-    for (int j = 0; j < 8; j++) {
-      bitWrite(frame[i], j, digitalRead(linea));
+  for (int i = 0; i < frameLength; i++)
+  {
+    for(int j = 0; j < 8; j++){
+      bitWrite(frameRX[i], j, digitalRead(linea));
       delayMicroseconds(Tbit);
     }
+    
   }
 
-  uint8_t* checkedFrame = hamming.checkFrameRicevuto(frame, frameLength);
-  uint8_t* data = hamming.estraiDati(checkedFrame, frameLength);
+  crc.reset();
+  crc.add(frameRX[0]);
+  crc.add(frameRX[1]);
+  uint16_t crcVal = crc.calc();
+  uint16_t crcRX = frame[2] | (frameRX[3]<<8);
+  if(crcVal == crcRX){
+    idDestRX = frameRX[0] >> 4;
+    idMitt   = frameRX[0] & 0xF;
+    dato     = frameRX[1];
 
-  // Estrazione di ID destinatario, ID mittente e dato
-  idDestRX = (data[1] >> 4) & 0xF;
-  idMitt = data[1] & 0xF;
-  dato = data[0];
-
-  Serial.println("Frame ricevuto corretto:");
-  for (int i = 0; i < frameLength; i++) {
-    for (int j = 0; j < 8; j++) {
-      Serial.print((bool)bitRead(checkedFrame[i], j));
+    if (idDestRX == id || idDest == idBroadcast)
+    {
+      Serial.print("Nuovo messaggio da ");
+      Serial.print(idMitt);
+      Serial.print(" il messaggio è ");
+      Serial.println(dato);
     }
-  }
-  Serial.println();
-
-  if (idDestRX == id || idDestRX == idBroadcast) {
-    Serial.print("Nuovo messaggio da ");
-    Serial.print(idMitt);
-    Serial.print(": ");
-    Serial.println(dato);
-  } else {
-    Serial.println("Nuovo messaggio non per me");
+    else
+    {
+      Serial.println("Nuovo messaggio non per me");
+    }
+  }else{
+    Serial.println("Messaggio ricevuto errato, CRC diverso");
   }
 
-  delete[] checkedFrame;
-  delete[] data;
+  
 }
 
-void Tx() {
-  Serial.println("Preparazione per inviare il messaggio...");
+void Tx()
+{
+  Serial.println("Invio");
 
-  // Creazione del frame base
-  frame[1] = (idDest << 4) | id;
-  frame[0] = dato;
+  frame[0] = ((unsigned long)idDest << 4) | id;
+  frame[1] = dato;
+  crc.reset();
+  crc.add(frame[0]);
+  crc.add(frame[1]);
+  uint16_t crcVal = crc.calc();
+  frame[2] = (crcVal << 8) >> 8;
+  frame[3] = crcVal >> 8;
 
-  Serial.println("Frame originale (senza Hamming):");
-  for (int i = frameLength - 1; i >= 0; i--) {
-    for (int j = 7; j >= 0; j--) {
-      Serial.print((bool)bitRead(frame[i], j));
-    }
-  }
-  Serial.println();
-
-  uint8_t* newFrame = hamming.calcNewFrame(frame, frameLength);
-
-  Serial.println("Frame con Hamming:");
-  for (int i = frameLength + 1; i >= 0; i--) { // Lunghezza corretta
-    for (int j = 7; j >= 0; j--) {
-      Serial.print((bool)bitRead(newFrame[i], j));
-    }
-  }
-  Serial.println();
-
-  // Simulazione della trasmissione
   digitalWrite(linea, start);
   delayMicroseconds(Tbit);
-  for (int i = 0; i < frameLength; i++) {
-    for (int j = 0; j < 8; j++) {
-      bool bit = bitRead(newFrame[i], j);
+  for (int i = 0; i < frameLength; i++)
+  {
+    for(int j = 0; j < 8; j++){
+      bool bit = bitRead(frame[i], j);
       digitalWrite(linea, bit);
       delayMicroseconds(Tbit);
+      Serial.print(bit);
     }
   }
   digitalWrite(linea, stop);
   delayMicroseconds(Tbit);
 
-  delete[] newFrame;
-
-  Serial.println("Messaggio trasmesso con successo.");
   delay(400);
 }
