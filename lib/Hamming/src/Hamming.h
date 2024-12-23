@@ -6,14 +6,28 @@
 class Hamming {
   public:
     Hamming();
-    long long calcNewFrame(long long frame);
-    long long checkFrameRicevuto(long long frame);
-    int getLunghezzaData(long data);
-    long long estraiDati(long long frame);
+    
+    // Calcola il nuovo frame con bit di controllo
+    uint8_t* calcNewFrame(uint8_t* frame, int frameLength);
+    
+    // Controlla un frame ricevuto e corregge eventuali errori
+    uint8_t* checkFrameRicevuto(uint8_t* frame, int frameLength);
+    
+    // Ottiene la lunghezza in bit di un dato
+    int getLunghezzaData(long long data);
+    
+    // Estrae i dati da un frame con bit di controllo
+    uint8_t* estraiDati(uint8_t* frame, int frameLength);
+
   private:
-    int calcNbitControllo(long long frame);
-    int* calcPosizioniBitControllo(long long frame);
-    int* calcValoreBitControllo(long long frame);
+    // Calcola il numero di bit di controllo necessari
+    int calcNbitControllo(int frameLength);
+
+    // Calcola le posizioni dei bit di controllo
+    int* calcPosizioniBitControllo(int nBitControllo);
+
+    // Calcola i valori dei bit di controllo
+    int* calcValoreBitControllo(uint8_t* frame, int frameLength, int nBitControllo);
 };
 
 #endif

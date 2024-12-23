@@ -3,104 +3,127 @@
 
 Hamming hamming;
 
-int pullUP = 7;
-int linea = 8;
-int start = 0;
-int stop = 1;
-int Tbit = 100;
+const int pullUP = 7;
+const int linea = 8;
+const int butt = 4;
 
-int id = 5;      // "IP" del mittente
-char dato = 'a'; // TX
-int idDest = 3;
+const int start = 0;
+const int stop = 1;
+const int Tbit = 100;
 
-int idDestRX = 3; // RX
-int idMitt;
-int idBroadcast = 15;
-int butt = 4;
-long long frame;
+const int id = 5; // ID del mittente
+char dato = 'a';  // Dato da trasmettere
+const int idDest = 3; // ID del destinatario
+const int idBroadcast = 15; // ID broadcast per tutti i nodi
+
+int idDestRX = 3; // ID destinatario ricevuto
+int idMitt;       // ID mittente ricevuto
+
+uint8_t frame[2]; // Frame da trasmettere
+int frameLength = 2;           // Lunghezza del frame in byte
 
 void Rx();
 void Tx();
 
-void setup()
-{
+void setup() {
   pinMode(linea, INPUT);
   pinMode(pullUP, OUTPUT);
-  Serial.begin(9600);
   pinMode(butt, INPUT_PULLUP);
+
+  Serial.begin(9600);
   digitalWrite(linea, HIGH);
 }
 
-void loop()
-{
-  while (digitalRead(butt) == HIGH)
-  {
-    if (digitalRead(linea) == LOW)
-    {
+void loop() {
+  if (digitalRead(butt) == HIGH) {
+    if (digitalRead(linea) == LOW) {
       Rx();
     }
-  }
-  if (digitalRead(linea) == HIGH)
-  {
+  } else if (digitalRead(linea) == HIGH) {
     Tx();
   }
 }
 
-void Rx()
-{
-  delayMicroseconds(Tbit + (Tbit / 2));
+void Rx() {
+  delayMicroseconds(Tbit + Tbit / 2);
 
-  for (int i = 0; i < 16; i++)
-  {
-    bitWrite(frame, i, digitalRead(linea));
-    delayMicroseconds(Tbit);
+  for (int i = 0; i < frameLength; i++) {
+    frame[i] = 0;
+    for (int j = 0; j < 8; j++) {
+      bitWrite(frame[i], j, digitalRead(linea));
+      delayMicroseconds(Tbit);
+    }
   }
-  frame = hamming.checkFrameRicevuto(frame);
-  frame = hamming.estraiDati(frame);
 
-  idDestRX = (unsigned int)frame >> 12;
-  idMitt = (unsigned int)(frame << 4) >> 12;
-  dato = (unsigned int)(frame << 8) >> 8;
+  uint8_t* checkedFrame = hamming.checkFrameRicevuto(frame, frameLength);
+  uint8_t* data = hamming.estraiDati(checkedFrame, frameLength);
 
-  if (idDestRX == id || idDest == idBroadcast)
-  {
+  // Estrazione di ID destinatario, ID mittente e dato
+  idDestRX = (data[1] >> 4) & 0xF;
+  idMitt = data[1] & 0xF;
+  dato = data[0];
+
+  Serial.println("Frame ricevuto corretto:");
+  for (int i = 0; i < frameLength; i++) {
+    for (int j = 0; j < 8; j++) {
+      Serial.print((bool)bitRead(checkedFrame[i], j));
+    }
+  }
+  Serial.println();
+
+  if (idDestRX == id || idDestRX == idBroadcast) {
     Serial.print("Nuovo messaggio da ");
     Serial.print(idMitt);
-    Serial.print(" il messaggio è ");
+    Serial.print(": ");
     Serial.println(dato);
-  }
-  else
-  {
+  } else {
     Serial.println("Nuovo messaggio non per me");
   }
+
+  delete[] checkedFrame;
+  delete[] data;
 }
 
-void Tx()
-{
-  Serial.println("Invio");
-  frame = 0LL;
+void Tx() {
+  Serial.println("Preparazione per inviare il messaggio...");
 
-  frame = frame | ((unsigned long)idDest << 12);
-  frame = frame | ((unsigned long)id << 8);
-  frame = frame | dato;
+  // Creazione del frame base
+  frame[1] = (idDest << 4) | id;
+  frame[0] = dato;
 
-  unsigned long long frameNew = hamming.calcNewFrame(frame);
+  Serial.println("Frame originale (senza Hamming):");
+  for (int i = frameLength - 1; i >= 0; i--) {
+    for (int j = 7; j >= 0; j--) {
+      Serial.print((bool)bitRead(frame[i], j));
+    }
+  }
+  Serial.println();
 
+  uint8_t* newFrame = hamming.calcNewFrame(frame, frameLength);
 
+  Serial.println("Frame con Hamming:");
+  for (int i = frameLength + 1; i >= 0; i--) { // Lunghezza corretta
+    for (int j = 7; j >= 0; j--) {
+      Serial.print((bool)bitRead(newFrame[i], j));
+    }
+  }
+  Serial.println();
+
+  // Simulazione della trasmissione
   digitalWrite(linea, start);
   delayMicroseconds(Tbit);
-  int frameNewSize = hamming.getLunghezzaData(frameNew);
-  Serial.println(frameNewSize);
-  for (int i = 0; i < frameNewSize; i++)
-  {
-    bool bit = bitRead(frameNew, i);
-    digitalWrite(linea, bit);
-    delayMicroseconds(Tbit);
-    //Serial.print(bit);
+  for (int i = 0; i < frameLength; i++) {
+    for (int j = 0; j < 8; j++) {
+      bool bit = bitRead(newFrame[i], j);
+      digitalWrite(linea, bit);
+      delayMicroseconds(Tbit);
+    }
   }
-
   digitalWrite(linea, stop);
   delayMicroseconds(Tbit);
 
+  delete[] newFrame;
+
+  Serial.println("Messaggio trasmesso con successo.");
   delay(400);
 }

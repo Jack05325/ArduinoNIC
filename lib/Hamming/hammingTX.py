@@ -1,4 +1,4 @@
-length = 13665
+length = 0b0011010101100001
 print(length)
 binval = list(bin(length)[2:])
 binval.reverse()
