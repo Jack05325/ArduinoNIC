@@ -1,10 +1,10 @@
 #include <Arduino.h>
+#include "Layer4.h"
 #include "CRC16.h"
 #include "CRC.h"
-#include "CrcFastReverse.h"
 
 CRC16 crc;
-
+Layer4 layer4;
 int pullUP = 7;
 int linea = 8;
 int start = 0;
@@ -19,25 +19,34 @@ int idDestRX = 0; // RX
 int idMitt;
 int idBroadcast = 15;
 int butt = 4;
-uint8_t frame[4];
-const size_t frameLength = sizeof(frame);
-uint8_t frameRX[4];
+String dati;
 
-void Rx();
-void Tx();
+struct pacchetto
+{
+  uint8_t dati[16];
+  uint8_t layer4[17];
+  uint8_t layer3[11];
+  uint8_t layer2[7];
+  uint8_t layer1[2];
+};
+struct pacchetto pkt;
+int dataType;
+uint8_t frameRX[sizeof(pacchetto)];
+//void Rx();
+//void Tx();
 
 void setup()
 {
   pinMode(linea, INPUT);
   pinMode(pullUP, OUTPUT);
-  Serial.begin(9600);
+  Serial.begin(115200);
   pinMode(butt, INPUT_PULLUP);
   digitalWrite(linea, HIGH);
 }
 
 void loop()
 {
-  while (digitalRead(butt) == HIGH)
+  while (!(Serial.available() > 0))
   {
     if (digitalRead(linea) == LOW)
     {
@@ -46,11 +55,38 @@ void loop()
   }
   if (digitalRead(linea) == HIGH)
   {
-    Tx();
+    dati = Serial.readString();    
+    Serial.println(dati);
+    dataType = dati.substring(0, 3).toInt();
+    switch (dataType)
+    {
+      case 00:
+        Serial.println("Dati");
+        break;
+      case 01:
+        Serial.println("ACK");
+        layer4.setFlags(0x01);
+        break;
+      case 10:
+        Serial.println("SYN");
+        layer4.setFlags(0x02);
+        break;
+      default:
+        break;
+    }
+    dati.getBytes(pkt.dati, 16);
+    Serial.println((char*)pkt.dati);
+    layer4.incapsulaDati(pkt);
+    Serial.println("Layer4: ");
+    for(int i = 0; i < sizeof(pkt.layer4); i++){
+      Serial.print(pkt.layer4[i], HEX);
+      Serial.print(" ");
+    }
+    //Tx();
   }
 }
 
-void Rx()
+/*void Rx()
 {
   delayMicroseconds(Tbit + (Tbit / 2));
 
@@ -119,4 +155,4 @@ void Tx()
   delayMicroseconds(Tbit);
 
   delay(400);
-}
+}*/
