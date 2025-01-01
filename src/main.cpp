@@ -31,6 +31,7 @@ struct pacchetto
   uint8_t layer2[7];
   uint8_t layer1[2];
 };
+
 struct pacchetto pkt;
 int dataType;
 uint8_t frameRX[sizeof(pacchetto)];
@@ -84,7 +85,7 @@ void loop()
       Serial.print(pkt.layer2[i], HEX);
       Serial.print(" ");
     }
-    
+
     Serial.println("Layer1: ");
     for(int i = 0; i < sizeof(pkt.layer1); i++){
       Serial.print(pkt.layer1[i], HEX);

@@ -26,9 +26,6 @@ void Layer3::incapsulaDati(struct pacchetto &ptk){
     ptk.layer3[8] =  TTL;
 
     crcl3.reset();
-    //for(uint8_t i : ptk.dati){
-    //    crc.add(i);
-    //}
     for(uint8_t i : ptk.layer3){
         crcl3.add(i);
     }
