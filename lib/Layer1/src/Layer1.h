@@ -14,10 +14,18 @@ class Layer1 {
 
         void setStopBit(int stop);
         int getStopBit();
+
+        void setTXPin(int pin);
+        int getTXPin();
+        
+        void setRXPin(int pin);
+        int getRXPin();
     private:
         uint16_t preambolo = 0xAA;
         int Tbit = 100;
         int stopBit = 1;
+        int TXPin = 8;
+        int RXPin = 7;
 
 };
 

@@ -1,12 +1,20 @@
 #include <Arduino.h>
+
 #include "Layer4.h"
 #include "Layer3.h"
+#include "Layer2.h"
+#include "Layer1.h"
+
 #include "CRC16.h"
 #include "CRC.h"
 
 CRC16 crc;
+
 Layer4 layer4;
 Layer3 layer3;
+Layer2 layer2;
+Layer1 layer1;
+
 int pullUP = 7;
 int linea = 8;
 int start = 0;
@@ -80,17 +88,21 @@ void loop()
       Serial.print(" ");
     }
 
+    layer2.incapsulaDati(pkt);
     Serial.println("Layer2: ");
     for(int i = 0; i < sizeof(pkt.layer2); i++){
       Serial.print(pkt.layer2[i], HEX);
       Serial.print(" ");
     }
 
+    layer1.incapsulaDati(pkt);
     Serial.println("Layer1: ");
     for(int i = 0; i < sizeof(pkt.layer1); i++){
       Serial.print(pkt.layer1[i], HEX);
       Serial.print(" ");
     }
+    Serial.println("Bit Inviati: ");
+    layer1.inviaPacchetto(pkt);
     //Tx();
   }
 }
