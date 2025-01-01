@@ -36,14 +36,14 @@ void Layer4::incapsulaDati(struct pacchetto &ptk)
     ptk.layer4[13]  = portaDestinazione >> 8;
     ptk.layer4[14]  = (portaDestinazione << 8) >> 8; 
     
-    crc.reset();
-    for(uint8_t i : ptk.dati){
-        crc.add(i);
-    }
+    crcl4.reset();
+    //for(uint8_t i : ptk.dati){
+    //    crc.add(i);
+    //}
     for(uint8_t i : ptk.layer4){
-        crc.add(i);
+        crcl4.add(i);
     }
-    uint16_t crcVal = crc.calc();
+    uint16_t crcVal = crcl4.calc();
     ptk.layer4[15] = crcVal >> 8;
     ptk.layer4[16] = (crcVal << 8) >> 8;
 }

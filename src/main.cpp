@@ -1,10 +1,12 @@
 #include <Arduino.h>
 #include "Layer4.h"
+#include "Layer3.h"
 #include "CRC16.h"
 #include "CRC.h"
 
 CRC16 crc;
 Layer4 layer4;
+Layer3 layer3;
 int pullUP = 7;
 int linea = 8;
 int start = 0;
@@ -40,6 +42,7 @@ void setup()
   pinMode(linea, INPUT);
   pinMode(pullUP, OUTPUT);
   Serial.begin(115200);
+  Serial.setTimeout(1);
   pinMode(butt, INPUT_PULLUP);
   digitalWrite(linea, HIGH);
 }
@@ -58,28 +61,33 @@ void loop()
     dati = Serial.readString();    
     Serial.println(dati);
     dataType = dati.substring(0, 3).toInt();
-    switch (dataType)
-    {
-      case 00:
-        Serial.println("Dati");
-        break;
-      case 01:
-        Serial.println("ACK");
-        layer4.setFlags(0x01);
-        break;
-      case 10:
-        Serial.println("SYN");
-        layer4.setFlags(0x02);
-        break;
-      default:
-        break;
-    }
+    Serial.println(dataType, HEX);
     dati.getBytes(pkt.dati, 16);
     Serial.println((char*)pkt.dati);
+
     layer4.incapsulaDati(pkt);
     Serial.println("Layer4: ");
     for(int i = 0; i < sizeof(pkt.layer4); i++){
       Serial.print(pkt.layer4[i], HEX);
+      Serial.print(" ");
+    }
+
+    layer3.incapsulaDati(pkt);
+    Serial.println("Layer3: "); 
+    for(int i = 0; i < sizeof(pkt.layer3); i++){
+      Serial.print(pkt.layer3[i], HEX);
+      Serial.print(" ");
+    }
+
+    Serial.println("Layer2: ");
+    for(int i = 0; i < sizeof(pkt.layer2); i++){
+      Serial.print(pkt.layer2[i], HEX);
+      Serial.print(" ");
+    }
+    
+    Serial.println("Layer1: ");
+    for(int i = 0; i < sizeof(pkt.layer1); i++){
+      Serial.print(pkt.layer1[i], HEX);
       Serial.print(" ");
     }
     //Tx();

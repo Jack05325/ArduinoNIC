@@ -28,7 +28,7 @@ class Layer4{
     uint32_t seqNumber = 0x12345678;
     uint16_t portaMittente = 0x1234;
     uint16_t portaDestinazione = 0x1234;
-    CRC16 crc;
+    CRC16 crcl4;
 };
 
 #endif
