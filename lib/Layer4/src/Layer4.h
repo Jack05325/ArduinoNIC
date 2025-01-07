@@ -8,7 +8,7 @@
 class Layer4{
     public:
         Layer4();
-        void incapsulaDati(struct pacchetto &ptk);
+        void incapsulaDati(struct Pacchetto &ptk);
         void setWindowSize(uint16_t _windowSize);
         void setFlags(uint8_t _flags);
         void setAckNumber(uint32_t _ackNumber);

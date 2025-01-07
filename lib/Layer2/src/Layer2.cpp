@@ -1,6 +1,6 @@
 #include "Layer2.h"
 
-struct pacchetto
+struct Pacchetto
 {
   uint8_t dati[16];
   uint8_t layer4[17];
@@ -13,7 +13,7 @@ struct pacchetto
 Layer2::Layer2() {
 }
 
-void Layer2::incapsulaDati(struct pacchetto &ptk){
+void Layer2::incapsulaDati(struct Pacchetto &ptk){
     ptk.layer2[0] = MAC_Destinazione >> 8;
     ptk.layer2[1] = (MAC_Destinazione << 8) >> 8;
 

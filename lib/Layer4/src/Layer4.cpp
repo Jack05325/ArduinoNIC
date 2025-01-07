@@ -1,9 +1,9 @@
 #include "Layer4.h"
 
-struct pacchetto
+struct Pacchetto
 {
   uint8_t dati[16];
-  uint8_t layer4[15];
+  uint8_t layer4[17];
   uint8_t layer3[11];
   uint8_t layer2[7];
   uint8_t layer1[2];
@@ -13,7 +13,7 @@ Layer4::Layer4(){
 
 }
 
-void Layer4::incapsulaDati(struct pacchetto &ptk)
+void Layer4::incapsulaDati(struct Pacchetto &ptk)
 {
     ptk.layer4[0] = windowSize >> 8;
     ptk.layer4[1] = (windowSize << 8) >> 8;

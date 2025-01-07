@@ -6,8 +6,8 @@
 class Layer1 {
     public:
         Layer1();
-        void incapsulaDati(struct pacchetto &pkt);
-        void inviaPacchetto(struct pacchetto &pkt);
+        void incapsulaDati(struct Pacchetto &pkt);
+        void inviaPacchetto(struct Pacchetto &pkt);
 
         void setTempoPerBit(int tempo);
         int getTempoPerBit();

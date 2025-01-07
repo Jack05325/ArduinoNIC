@@ -1,0 +1,10 @@
+#MAC_DESTINAZIONE   = 0x1234 !Non credo che sia da impostare a livello applicaizone, se ne occupa il layer 2
+#MAC_MITTENTE       = 0x1234
+IP_DESTINAZIONE    = 0x12345678
+#IP_MITTENTE        = 0x12345678 !Non credo che sia da impostare a livello applicaizone, se ne occupa il layer 3 --> anche se in qualche modo va impostato all'avvio visto che non abbiamo un server DHCP
+TTL                = 0x12
+PORTA_DESTINAZIONE = 0x1234
+PORTA_MITTENTE     = 0x1234 
+#FLAG               = 0x12 !Se ne occupa il layer 4 (TCP/UDP) per la gestione della connessione
+#WINDOW_SIZE        = 0x1234 !Per il momento non la usiamo, cmq informazione che va negoziata con il destinatario
+DATI               = "ciao"

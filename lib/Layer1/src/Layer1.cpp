@@ -1,7 +1,7 @@
 #include "layer1.h"
 #include "Arduino.h"
 
-struct pacchetto
+struct Pacchetto
 {
   uint8_t dati[16];
   uint8_t layer4[17];
@@ -14,12 +14,12 @@ Layer1::Layer1() {
 
 }
 
-void Layer1::incapsulaDati(struct  pacchetto &pkt) {
+void Layer1::incapsulaDati(struct  Pacchetto &pkt) {
     pkt.layer1[0] = preambolo >> 8;
     pkt.layer1[1] = (preambolo << 8) >> 8;
 }
 
-void Layer1::inviaPacchetto(struct pacchetto &pkt) {
+void Layer1::inviaPacchetto(struct Pacchetto &pkt) {
     //!Invio Layer 1
     for(int i = 0; i < sizeof(pkt.layer1); i++){
         for(int j = 0; j < 8; j++){
