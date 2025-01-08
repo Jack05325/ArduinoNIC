@@ -9,9 +9,7 @@ struct Pacchetto
   uint8_t layer1[2];
 };
 
-Layer3::Layer3() {
-
-}
+Layer3::Layer3() {}
 
 void Layer3::incapsulaDati(struct Pacchetto& ptk) {
     memcpy(ptk.layer3, IP_Destinazione, 4);

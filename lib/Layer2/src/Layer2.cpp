@@ -14,21 +14,25 @@ Layer2::Layer2() {
 }
 
 void Layer2::incapsulaDati(struct Pacchetto &ptk){
-    ptk.layer2[0] = MAC_Destinazione >> 8;
-    ptk.layer2[1] = (MAC_Destinazione << 8) >> 8;
+    //ptk.layer2[0] = MAC_Destinazione >> 8;
+    //ptk.layer2[1] = (MAC_Destinazione << 8) >> 8;
+    memcpy(ptk.layer2, &MAC_Destinazione, 2);
 
-    ptk.layer2[2] = MAC_Mittente >> 8;
-    ptk.layer2[3] = (MAC_Mittente << 8) >> 8;
+    //ptk.layer2[2] = MAC_Mittente >> 8;
+    //ptk.layer2[3] = (MAC_Mittente << 8) >> 8//;
+    memcpy(ptk.layer2 + 2, &MAC_Mittente, 2);
 
-    ptk.layer2[4] = protocolType;
+    //ptk.layer2[4] = protocolType;
+    memcpy(ptk.layer2 + 4, &protocolType, 1);
 
     crcl2.reset();
     for(uint8_t i : ptk.layer3){
         crcl2.add(i);
     }
     uint16_t crcVal = crcl2.calc();
-    ptk.layer2[5] = crcVal >> 8;
-    ptk.layer2[6] = (crcVal << 8) >> 8;
+    //ptk.layer2[5] = crcVal >> 8;
+    //ptk.layer2[6] = (crcVal << 8) >> 8;
+    memcpy(ptk.layer2 + (2+2+1), &crcVal, 2);
 }
 
 uint16_t Layer2::getMAC_Destinazione() const {

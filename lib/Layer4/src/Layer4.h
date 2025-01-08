@@ -22,13 +22,13 @@ class Layer4{
         uint16_t getPortaMittente() const;
         uint16_t getPortaDestinazione() const;
     private:
-    uint16_t windowSize = 0x1234;
-    uint8_t flags = 0x12;
-    uint32_t ackNumber = 0x12345678;
-    uint32_t seqNumber = 0x12345678;
-    uint16_t portaMittente = 0x1234;
-    uint16_t portaDestinazione = 0x1234;
-    CRC16 crcl4;
+        uint16_t windowSize = 0x1234;
+        uint8_t flags = 0x12;
+        uint32_t ackNumber = 0x12345678;
+        uint32_t seqNumber = 0x12345678;
+        uint16_t portaMittente = 0x1234;
+        uint16_t portaDestinazione = 0x1234;
+        CRC16 crcl4;
 };
 
 #endif

@@ -15,11 +15,12 @@ Layer1::Layer1() {
 }
 
 void Layer1::incapsulaDati(struct  Pacchetto &pkt) {
-    pkt.layer1[0] = preambolo >> 8;
-    pkt.layer1[1] = (preambolo << 8) >> 8;
+//    pkt.layer1[0] = preambolo >> 8;
+//    pkt.layer1[1] = (preambolo << 8) >> 8;
+    memcpy(pkt.layer1, &preambolo, 2);
 }
 
-void Layer1::inviaPacchetto(struct Pacchetto &pkt) {
+void Layer1::inviaFrame(struct Pacchetto &pkt) {
     //!Invio Layer 1
     for(int i = 0; i < sizeof(pkt.layer1); i++){
         for(int j = 0; j < 8; j++){
@@ -71,8 +72,9 @@ void Layer1::inviaPacchetto(struct Pacchetto &pkt) {
     Serial.print(stopBit);
 }
 
-
-
+struct Pacchetto Layer1::riceviFrame(){
+    
+}
 
 void Layer1::setTempoPerBit(int tempo) {
     Tbit = tempo;

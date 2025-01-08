@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "TaskScheduler.h"
 
 #include "SerialInputManager.h"
 #include "Layer4.h"
@@ -67,7 +68,7 @@ void loop()
   {
     if (digitalRead(linea) == LOW)
     {
-      //Rx();
+
     }
   }
   if (digitalRead(linea) == HIGH)
