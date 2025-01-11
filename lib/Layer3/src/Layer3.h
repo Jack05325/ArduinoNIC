@@ -23,7 +23,7 @@ public:
 private:
     uint8_t IP_Destinazione[4] = {0, 0, 0, 0};
     uint8_t IP_Mittente[4]     = {0, 0, 0, 0};
-    uint8_t TTL                = 0;
+    uint8_t TTL                = 0x00;
     CRC16 crcl3;
 };
 

@@ -26,9 +26,13 @@ bool Layer1::isLineaLibera() {
 }
 
 void Layer1::incapsulaDati(struct Pacchetto &pkt) {
-  // pkt.layer1[0] = preambolo >> 8;
-  // pkt.layer1[1] = (preambolo << 8) >> 8;
-  memcpy(pkt.layer1, &preambolo, LAYER1_SIZE);
+   pkt.layer1[0] = preambolo >> 8;
+   pkt.layer1[1] = (preambolo << 8) >> 8;
+  //memcpy(pkt.layer1, &preambolo, LAYER1_SIZE);
+
+  Serial.print("Preambolo: ");
+  Serial.print(pkt.layer1[0]);
+  Serial.println(pkt.layer1[1]);
 }
 
 void Layer1::transmitLayer(const uint8_t* data, size_t size) {
@@ -37,7 +41,7 @@ void Layer1::transmitLayer(const uint8_t* data, size_t size) {
       bool bit = bitRead(data[i], j);
       digitalWrite(TXPin, bit);
       delayMicroseconds(Tbit);
-      // Serial.print(bit);
+      //Serial.print(bit);
     }
   }
 }
@@ -56,9 +60,13 @@ void Layer1::inviaFrame(Pacchetto pkt) {
 
 }
 
-void Layer1::inviaFrame(StackArray<Pacchetto> stackPacchetti, int numeroPacchettiDaInviare, int delay) {
-  for (int i = 0; i < stackPacchetti.count(); ++i) {
-    inviaFrame(stackPacchetti.pop());
+uint16_t Layer1::getPreambolo() {
+  return preambolo;
+}
+
+void Layer1::inviaFrame(StackArray<Pacchetto> &stackPacchettiDaInviare, int numeroPacchettiDaInviare, int delay) {
+  for (int i = 0; i < stackPacchettiDaInviare.count(); ++i) {
+    inviaFrame(stackPacchettiDaInviare.pop());
     delayMicroseconds(delay);
   }
 }

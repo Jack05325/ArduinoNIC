@@ -37,38 +37,42 @@ struct Pacchetto {
   uint8_t layer1[LAYER1_SIZE];
 };
 
-uint8_t data[16];
-uint8_t IP_Dest[4];
 
-Pacchetto pkt;
-
+StackArray<Pacchetto> stackPacchetti;
+StackArray<Pacchetto> stackPacchettiDaInviare;
 
 void setup()
 {
   Serial.begin(115200);
   Serial.setTimeout(2);
+  stackPacchetti.setPrinter(Serial);
+  stackPacchettiDaInviare.setPrinter(Serial);
 }
 
 
-StackArray<Pacchetto> stackPacchetti;
-StackArray<Pacchetto> stackPacchettiDaInviare;
 
 void handleUDP(){
   sim.handleInput(&stackPacchetti, layer3, layer4);
+
   for(int i = 0; i < stackPacchetti.count(); i++){
-    Pacchetto pkt = stackPacchetti.pop();
-    stackPacchetti.unshift(pkt);
+    Pacchetto pkt = stackPacchetti.pop();    
     layer4->incapsulaDati(pkt);
     layer3->incapsulaDati(pkt);
     layer2->incapsulaDati(pkt);
     layer1->incapsulaDati(pkt);
+    stackPacchetti.unshift(pkt);
   }
 
+  layer1->inviaFrame(stackPacchetti, stackPacchetti.count(), 0);
+
   if(layer1->isLineaLibera()){
+    Serial.println("Linea libera");
     layer1->inviaFrame(stackPacchetti, stackPacchetti.count(), 100);
   }
   else{
-    stackPacchettiDaInviare.unshift(stackPacchetti.pop());
+    for(int i = 0; i < stackPacchetti.count(); i++){
+      stackPacchettiDaInviare.unshift(stackPacchetti.pop());
+    }
   }
 }
 
@@ -76,9 +80,13 @@ void loop()
 {
   while (!Serial.available()) {
     if(layer1->isLineaLibera() && !stackPacchettiDaInviare.isEmpty()){
+      Serial.println("Linea libera");
       layer1->inviaFrame(stackPacchettiDaInviare, stackPacchettiDaInviare.count(), 100);
     }
   }
+  Serial.println("Received");
+
   handleUDP();
+
 
 }

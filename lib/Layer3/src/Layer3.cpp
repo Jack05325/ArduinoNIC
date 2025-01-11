@@ -17,8 +17,17 @@ struct Pacchetto {
 Layer3::Layer3() {}
 
 void Layer3::incapsulaDati(struct Pacchetto& pkt) {
-    memcpy(pkt.layer3, IP_Destinazione, 4);
-    memcpy(pkt.layer3 + 4, IP_Mittente, 4);
+    //memcpy(pkt.layer3, IP_Destinazione, 4);
+    //memcpy(pkt.layer3 + 4, IP_Mittente, 4);
+    pkt.layer3[0] = IP_Destinazione[0];
+    pkt.layer3[1] = IP_Destinazione[1];
+    pkt.layer3[2] = IP_Destinazione[2];
+    pkt.layer3[3] = IP_Destinazione[3];
+
+    pkt.layer3[4] = IP_Mittente[0];
+    pkt.layer3[5] = IP_Mittente[1];
+    pkt.layer3[6] = IP_Mittente[2];
+    pkt.layer3[7] = IP_Mittente[3];
 
     pkt.layer3[8] = TTL;
 
@@ -30,6 +39,11 @@ void Layer3::incapsulaDati(struct Pacchetto& pkt) {
 
     pkt.layer3[9] = crcVal >> 8;
     pkt.layer3[10] = crcVal & 0xFF00;
+
+    /*for(int i = 0; i < 11; i++){
+        Serial.print(pkt.layer3[i]);
+    }
+    Serial.println();*/
 }
 
 const uint8_t* Layer3::getIP_Destinazione() const {

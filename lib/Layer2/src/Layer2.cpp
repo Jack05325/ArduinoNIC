@@ -19,25 +19,30 @@ Layer2::Layer2() {
 }
 
 void Layer2::incapsulaDati(struct Pacchetto &pkt){
-    //pkt.layer2[0] = MAC_Destinazione >> 8;
-    //pkt.layer2[1] = (MAC_Destinazione << 8) >> 8;
-    memcpy(pkt.layer2, &MAC_Destinazione, 2);
+    pkt.layer2[0] = MAC_Destinazione >> 8;
+    pkt.layer2[1] = (MAC_Destinazione << 8) >> 8;
+    //memcpy(pkt.layer2, &MAC_Destinazione, 2);
 
-    //pkt.layer2[2] = MAC_Mittente >> 8;
-    //pkt.layer2[3] = (MAC_Mittente << 8) >> 8//;
-    memcpy(pkt.layer2 + 2, &MAC_Mittente, 2);
+    pkt.layer2[2] = MAC_Mittente >> 8;
+    pkt.layer2[3] = (MAC_Mittente << 8) >> 8;
+    //memcpy(pkt.layer2 + 2, &MAC_Mittente, 2);
 
-    //pkt.layer2[4] = protocolType;
-    memcpy(pkt.layer2 + 4, &protocolType, 1);
+    pkt.layer2[4] = protocolType;
+    //memcpy(pkt.layer2 + 4, &protocolType, 1);
 
     crcl2.reset();
     for(uint8_t i : pkt.layer3){
         crcl2.add(i);
     }
     uint16_t crcVal = crcl2.calc();
-    //pkt.layer2[5] = crcVal >> 8;
-    //pkt.layer2[6] = (crcVal << 8) >> 8;
-    memcpy(pkt.layer2 + (2+2+1), &crcVal, 2);
+    pkt.layer2[5] = crcVal >> 8;
+    pkt.layer2[6] = (crcVal << 8) >> 8;
+    //memcpy(pkt.layer2 + (2+2+1), &crcVal, 2);
+    
+    /*for(int i = 0; i < 7; i++){
+        Serial.print(pkt.layer2[i], HEX);
+    }
+    Serial.println();*/
 }
 
 uint16_t Layer2::getMAC_Destinazione() const {

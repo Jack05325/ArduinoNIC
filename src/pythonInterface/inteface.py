@@ -9,12 +9,11 @@ from Flags import *
 
 
 # Configurazione porta seriale
-arduino = serial.Serial('/dev/cu.usbmodem1101', baudrate=115200, timeout=2)
+arduino = serial.Serial('/dev/cu.usbserial-120', baudrate=115200, timeout=2)
 
 def write_read(x):
     arduino.reset_input_buffer()  # Pulisci il buffer
     arduino.write(bytes(x , 'utf-8'))  # Aggiungi terminatore
-    time.sleep(0.1)  # Tempo di attesa per la risposta
     data = arduino.readlines()
     return data
 
