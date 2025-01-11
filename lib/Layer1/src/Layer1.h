@@ -2,12 +2,17 @@
 #define LAYER1_H
 
 #include "Arduino.h"
+#include "StackArray.h"
+
 
 class Layer1 {
     public:
         Layer1();
         void incapsulaDati(struct Pacchetto &pkt);
-        void inviaFrame(struct Pacchetto &pkt);
+        void inviaFrame(Pacchetto stackPacchetti); //*Invia un singolo pacchetto
+        void inviaFrame(StackArray<Pacchetto> stackPacchetti, int numeroPacchettiDaInviare, int delay); //*Invia un numero di pacchetti specificato con un delay(in microsecondi) tra un pacchetto e l'altro
+        bool isLineaLibera();
+
         struct Pacchetto riceviFrame();
 
         void setTempoPerBit(int tempo);
@@ -22,6 +27,7 @@ class Layer1 {
         void setRXPin(int pin);
         int getRXPin();
     private:
+        void transmitLayer(const uint8_t *layer, size_t size);
         uint16_t preambolo = 0xAA;
         int Tbit = 100;
         int stopBit = 1;

@@ -8,7 +8,7 @@
 class Layer2 {
     public:
         Layer2();
-        void incapsulaDati(struct Pacchetto &ptk);
+        void incapsulaDati(struct Pacchetto &pkt);
 
         uint16_t getMAC_Destinazione() const;
         void setMAC_Destinazione(uint16_t mac);

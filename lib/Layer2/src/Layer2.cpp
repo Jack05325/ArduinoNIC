@@ -1,38 +1,43 @@
 #include "Layer2.h"
 
-struct Pacchetto
-{
-  uint8_t dati[16];
-  uint8_t layer4[17];
-  uint8_t layer3[11];
-  uint8_t layer2[7];
-  uint8_t layer1[2];
+const uint8_t DATA_SIZE = 16;
+const uint8_t LAYER4_SIZE = 17;
+const uint8_t LAYER3_SIZE = 11;
+const uint8_t LAYER2_SIZE = 7;
+const uint8_t LAYER1_SIZE = 2;
+
+struct Pacchetto {
+  uint8_t dati[DATA_SIZE];
+  uint8_t layer4[LAYER4_SIZE];
+  uint8_t layer3[LAYER3_SIZE];
+  uint8_t layer2[LAYER2_SIZE];
+  uint8_t layer1[LAYER1_SIZE];
 };
 
 
 Layer2::Layer2() {
 }
 
-void Layer2::incapsulaDati(struct Pacchetto &ptk){
-    //ptk.layer2[0] = MAC_Destinazione >> 8;
-    //ptk.layer2[1] = (MAC_Destinazione << 8) >> 8;
-    memcpy(ptk.layer2, &MAC_Destinazione, 2);
+void Layer2::incapsulaDati(struct Pacchetto &pkt){
+    //pkt.layer2[0] = MAC_Destinazione >> 8;
+    //pkt.layer2[1] = (MAC_Destinazione << 8) >> 8;
+    memcpy(pkt.layer2, &MAC_Destinazione, 2);
 
-    //ptk.layer2[2] = MAC_Mittente >> 8;
-    //ptk.layer2[3] = (MAC_Mittente << 8) >> 8//;
-    memcpy(ptk.layer2 + 2, &MAC_Mittente, 2);
+    //pkt.layer2[2] = MAC_Mittente >> 8;
+    //pkt.layer2[3] = (MAC_Mittente << 8) >> 8//;
+    memcpy(pkt.layer2 + 2, &MAC_Mittente, 2);
 
-    //ptk.layer2[4] = protocolType;
-    memcpy(ptk.layer2 + 4, &protocolType, 1);
+    //pkt.layer2[4] = protocolType;
+    memcpy(pkt.layer2 + 4, &protocolType, 1);
 
     crcl2.reset();
-    for(uint8_t i : ptk.layer3){
+    for(uint8_t i : pkt.layer3){
         crcl2.add(i);
     }
     uint16_t crcVal = crcl2.calc();
-    //ptk.layer2[5] = crcVal >> 8;
-    //ptk.layer2[6] = (crcVal << 8) >> 8;
-    memcpy(ptk.layer2 + (2+2+1), &crcVal, 2);
+    //pkt.layer2[5] = crcVal >> 8;
+    //pkt.layer2[6] = (crcVal << 8) >> 8;
+    memcpy(pkt.layer2 + (2+2+1), &crcVal, 2);
 }
 
 uint16_t Layer2::getMAC_Destinazione() const {

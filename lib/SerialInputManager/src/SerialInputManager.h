@@ -3,13 +3,16 @@
 
 #include <Arduino.h>
 #include <StringSplitter.h>
+#include "Layer3.h"
+#include "Layer4.h"
+#include "StackArray.h"
 
 class SerialInputManager {
 public:
-    SerialInputManager(long baudRate);
-    struct Pacchetto handleInput(struct Pacchetto &pkt);
+    SerialInputManager(long baudRate, int timeout);
+    void handleInput(StackArray<Pacchetto>* stackPacchetti, Layer3 *layer3, Layer4 *layer4);
 private:
-    void parseInputBuffer(StringSplitter* splitter, struct Pacchetto &pkt);
+    void parseInputBuffer(StackArray<Pacchetto> *stackPacchetto, StringSplitter* splitter, Layer3 *layer3, Layer4 *layer4);
     String inputBuffer;
     StringSplitter *splitter = nullptr;
 };

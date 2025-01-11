@@ -9,7 +9,7 @@
 class Layer3 {
 public:
     Layer3();
-    void incapsulaDati(struct Pacchetto& ptk);
+    void incapsulaDati(struct Pacchetto& pkt);
 
     const uint8_t* getIP_Destinazione() const;
     void setIP_Destinazione(uint8_t* ip);
