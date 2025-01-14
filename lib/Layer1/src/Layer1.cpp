@@ -30,9 +30,9 @@ void Layer1::incapsulaDati(struct Pacchetto &pkt) {
    pkt.layer1[1] = (preambolo << 8) >> 8;
   //memcpy(pkt.layer1, &preambolo, LAYER1_SIZE);
 
-  Serial.print("Preambolo: ");
-  Serial.print(pkt.layer1[0]);
-  Serial.println(pkt.layer1[1]);
+  //Serial.print("Preambolo: ");
+  //Serial.print(pkt.layer1[0]);
+  //Serial.println(pkt.layer1[1]);
 }
 
 void Layer1::transmitLayer(const uint8_t* data, size_t size) {
@@ -41,7 +41,7 @@ void Layer1::transmitLayer(const uint8_t* data, size_t size) {
       bool bit = bitRead(data[i], j);
       digitalWrite(TXPin, bit);
       delayMicroseconds(Tbit);
-      //Serial.print(bit);
+      Serial.print(bit);
     }
   }
 }

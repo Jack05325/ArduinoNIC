@@ -10,7 +10,7 @@
 class SerialInputManager {
 public:
     SerialInputManager(long baudRate, int timeout);
-    void handleInput(StackArray<Pacchetto>* stackPacchetti, Layer3 *layer3, Layer4 *layer4);
+    void handleInput(String inputBuffer, StackArray<Pacchetto>* stackPacchetti, Layer3 *layer3, Layer4 *layer4);
 private:
     void parseInputBuffer(StackArray<Pacchetto> *stackPacchetto, StringSplitter* splitter, Layer3 *layer3, Layer4 *layer4);
     String inputBuffer;

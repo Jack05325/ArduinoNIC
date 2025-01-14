@@ -19,37 +19,42 @@ struct Pacchetto {
 };
 
 SerialInputManager::SerialInputManager(long baudRate, int timeout) {
-    Serial.begin(baudRate);
-    Serial.setTimeout(timeout);
+    //Serial.begin(baudRate);
+    //Serial.setTimeout(timeout);
 }
 
-//!Controllare eventuali memory leak per evitare attachi --> anche se magari potrebbe essere interessante per sperimente diversi tipi di attacchi di cyber security
-void SerialInputManager::handleInput(StackArray<Pacchetto>* stackPacchetti, Layer3 *layer3, Layer4 *layer4){
-    inputBuffer = "";
-    inputBuffer = Serial.readString();
-    delete splitter;
+void SerialInputManager::handleInput(String inputBuffer, StackArray<Pacchetto>* stackPacchetti, Layer3 *layer3, Layer4 *layer4){
+    //inputBuffer = "";
+    //inputBuffer = Serial.readString();
+    //Serial.println(inputBuffer);
     splitter = new StringSplitter(inputBuffer, '|', 5);    
     parseInputBuffer(stackPacchetti, splitter, layer3, layer4);
+    Serial.println(stackPacchetti->count());
 }
 
 void SerialInputManager::parseInputBuffer(StackArray<Pacchetto> *stackPacchetti ,StringSplitter *splitter, Layer3* layer3, Layer4 *layer4){
     String IP_Dest = splitter->getItemAtIndex(0);
-    int length = (splitter->getItemAtIndex(4).length()/16) + 1;
+    int length = (16 + splitter->getItemAtIndex(4).length() - 1) / 16;    
+    Serial.print("L 5: ");
+    Serial.println(length);
     Pacchetto pktTmp;
+
     //!Creo lo stack di pacchetti inserendo solo i dati, poichè il layer 3 e 4 sono uguali per tutti i pacchetti e lo fa nel main --> possibile modifica parlare con il prof
     for(int i = 0; i < length; i++){
-        memcpy(pktTmp.dati, splitter->getItemAtIndex(4).substring(i*16, 16).c_str(), 16);
+        memcpy(pktTmp.dati, splitter->getItemAtIndex(4).substring(i*16, ((i+1)*16)).c_str(), 16);
         stackPacchetti->push(pktTmp);
+        Serial.println(splitter->getItemAtIndex(4).substring(i*16, (((i+1)*16))));
+        Serial.println(stackPacchetti->count());
     }
     layer3->setTTL(splitter->getItemAtIndex(1).toInt());
     layer4->setPortaDestinazione((uint16_t)splitter->getItemAtIndex(2).toInt());
     layer4->setPortaMittente((uint16_t)splitter->getItemAtIndex(3).toInt()); 
 
-    Serial.println(IP_Dest);
-    Serial.println(splitter->getItemAtIndex(1));
-    Serial.println(splitter->getItemAtIndex(2).toInt(), HEX);
-    Serial.println(splitter->getItemAtIndex(3).toInt(), HEX);
-    Serial.println(splitter->getItemAtIndex(4));
+    //Serial.println(IP_Dest);
+    //Serial.println(splitter->getItemAtIndex(1));
+    //Serial.println(splitter->getItemAtIndex(2).toInt(), HEX);
+    //Serial.println(splitter->getItemAtIndex(3).toInt(), HEX);
+    //Serial.println(splitter->getItemAtIndex(4));
 
     delete splitter;
 
