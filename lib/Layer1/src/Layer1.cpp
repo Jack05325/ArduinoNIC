@@ -71,34 +71,84 @@ void Layer1::inviaFrame(StackArray<Pacchetto> &stackPacchettiDaInviare, int nume
   }
 }
 
-struct Pacchetto Layer1::riceviFrame(){
-    byte buffer[(int) sizeof(Pacchetto ) - (int) sizeof(preambolo)];
-    uint16_t preamboloRicevuto = 0;
-    if (digitalRead(RXPin) == LOW){
-        delayMicroseconds(Tbit/2);
-        for(int i = 0; i < (int) sizeof(preambolo)*8; i++){
-            bool bit = digitalRead(RXPin);
-            bitWrite(preamboloRicevuto, i, bit);
-            delayMicroseconds(Tbit);
-        }
-        preamboloRicevuto = ~preamboloRicevuto;
-        if(preamboloRicevuto == preambolo){
-            for(int i = 0; i < (int) sizeof(buffer); i++){
-                for(int j = 0; j < 8; j++){
-                    bool bit = !digitalRead(RXPin);
-                    bitWrite(buffer[i], j, bit);
-                    delayMicroseconds(Tbit);
-                }
-            }
-        }
-        else{
-            Serial.println("Errore: Preambolo non corrisponde");
-        }
+Pacchetto Layer1::riceviFrame(Pacchetto pkt){
+  Pacchetto pktRicevuto;
+  for(int i = 0; i < (int) sizeof(pktRicevuto.layer1); i++){
+    for(int j = 0; j < 8; j++){
+      //bool bit = digitalRead(RXPin);
+      bool bit = bitRead(pkt.layer1[i], j);
+      bitWrite(pktRicevuto.layer1[i], j, bit);
+      delayMicroseconds(Tbit);
     }
-    Pacchetto pkt;
-    memcpy(&pkt, buffer, (int) sizeof(buffer));
-    return pkt;
+  }
+
+  for(int i = 0; i < (int) sizeof(pktRicevuto.layer2); i++){
+    for(int j = 0; j < 8; j++){
+      //bool bit = digitalRead(RXPin);
+      bool bit = bitRead(pkt.layer2[i], j);
+      bitWrite(pktRicevuto.layer2[i], j, bit);
+      delayMicroseconds(Tbit);
+    }
+  }
+
+  for(int i = 0; i < (int) sizeof(pktRicevuto.layer3); i++){
+    for(int j = 0; j < 8; j++){
+      //bool bit = digitalRead(RXPin);
+      bool bit = bitRead(pkt.layer3[i], j);
+      bitWrite(pktRicevuto.layer3[i], j, bit);
+      delayMicroseconds(Tbit);
+    }
+  }
+
+  for(int i = 0; i < (int) sizeof(pktRicevuto.layer4); i++){
+    for(int j = 0; j < 8; j++){
+      //bool bit = digitalRead(RXPin);
+      bool bit = bitRead(pkt.layer4[i], j);
+      bitWrite(pktRicevuto.layer4[i], j, bit);
+      delayMicroseconds(Tbit);
+    }
+  }
+
+  for(int i = 0; i < (int) sizeof(pktRicevuto.dati); i++){
+    for(int j = 0; j < 8; j++){
+      //bool bit = digitalRead(RXPin);
+      bool bit = bitRead(pkt.dati[i], j);
+      bitWrite(pktRicevuto.dati[i], j, bit);
+      delayMicroseconds(Tbit);
+    }
+  }
+  return pktRicevuto;
 }
+
+//Pacchetto Layer1::riceviFrame(uint8_t SimPacchetto[51]){
+//    byte buffer[(int) sizeof(Pacchetto ) - (int) sizeof(preambolo)];
+//    uint16_t preamboloRicevuto = 0;
+//    if (digitalRead(RXPin) == LOW){
+//        delayMicroseconds(Tbit/2);
+//        for(int i = 0; i < (int) sizeof(preambolo)*8; i++){
+//            bool bit = digitalRead(RXPin);
+//            bitWrite(preamboloRicevuto, i, bit);
+//            delayMicroseconds(Tbit);
+//        }
+//        preamboloRicevuto = ~preamboloRicevuto;
+//        if(preamboloRicevuto == preambolo){
+//            for(int i = 0; i < (int) sizeof(buffer); i++){
+//                for(int j = 0; j < 8; j++){
+//                    //bool bit = !digitalRead(RXPin);
+//                    bool bit = bitRead(SimPacchetto[i], j);
+//                    bitWrite(buffer[i], j, bit);
+//                    delayMicroseconds(Tbit);
+//                }
+//            }
+//        }
+//        else{
+//            Serial.println("Errore: Preambolo non corrisponde");
+//        }
+//    }
+//    Pacchetto pkt;
+//    memcpy(&pkt, buffer, (int) sizeof(buffer));
+//    return pkt;
+//}
 
 void Layer1::setTempoPerBit(int tempo) {
     Tbit = tempo;

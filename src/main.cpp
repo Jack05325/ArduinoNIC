@@ -7,12 +7,14 @@
 #include "Layer2.h"
 #include "Layer1.h"
 
+
 Layer4 *layer4 = new Layer4();
 Layer3 *layer3 = new Layer3();
 Layer2 *layer2 = new Layer2();
 Layer1 *layer1 = new Layer1();
 
 SerialInputManager sim(9600, 2);
+
 
 
 const uint8_t DATA_SIZE = 16;
@@ -44,6 +46,8 @@ void setup()
 }
 
 char buffer[100] = {0};
+StackArray<Pacchetto> stackPacchettiRXtest;
+
 
 void handleUDP(){  
 
@@ -60,15 +64,32 @@ void handleUDP(){
 
   //layer1->inviaFrame(stackPacchetti, stackPacchetti.count(), 0);
   
-  if(layer1->isLineaLibera()){
-    Serial.println("Linea libera");
-    layer1->inviaFrame(stackPacchetti, stackPacchetti.count(), 0);
+  //if(layer1->isLineaLibera()){
+  //  Serial.println("Linea libera");
+  //  layer1->inviaFrame(stackPacchetti, stackPacchetti.count(), 0);
+  //}
+  //else{
+  //  Serial.println("Linea occupata");
+  //  for(int i = 0; i < stackPacchetti.count()+1; i++){
+  //    Pacchetto pkt = stackPacchetti.pop();
+  //    stackPacchettiDaInviare.unshift(pkt);
+  //  }
+  //}
+  Serial.println("L stack pacchetti da inviare: " + String(stackPacchettiDaInviare.count()));
+  Serial.println("L stack pacchetti: " + String(stackPacchetti.count()));
+  Serial.println("Test invio");
+  int lStack = stackPacchetti.count();
+  for(int i = 0; i < lStack; i++){
+    Pacchetto pkt = stackPacchetti.pop();
+    stackPacchettiRXtest.unshift(pkt);
+    layer1->inviaFrame(pkt);
+    Serial.println("Inviato");
   }
-  else{
-    Serial.println("Linea occupata");
-    for(int i = 0; i < stackPacchetti.count(); i++){
-      stackPacchettiDaInviare.unshift(stackPacchetti.pop());
-    }
+  Serial.println("Test ricezione");  
+  for(int i = 0; i < lStack; i ++){
+    Pacchetto pktRX = layer1->riceviFrame(stackPacchettiRXtest.pop());
+    layer1->inviaFrame(pktRX);
+    Serial.println("Ricevuto");
   }
   Serial.println("UDP Finito");
 }
@@ -76,10 +97,10 @@ void handleUDP(){
 void loop()
 {
   while (Serial.available() == 0) {
-    /*if(layer1->isLineaLibera() && !stackPacchettiDaInviare.isEmpty()){
-      //Serial.println("Linea libera");
+    if(layer1->isLineaLibera() && !stackPacchettiDaInviare.isEmpty()){
+      Serial.println("Linea libera");
       layer1->inviaFrame(stackPacchettiDaInviare, stackPacchettiDaInviare.count(), 100);
-    }*/
+    }
   }
 
   Serial.readBytes(buffer, 100);
