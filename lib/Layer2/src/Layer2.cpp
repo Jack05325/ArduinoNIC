@@ -45,6 +45,17 @@ void Layer2::incapsulaDati(struct Pacchetto &pkt){
     Serial.println();*/
 }
 
+bool Layer2::checkPacketRecived(const struct Pacchetto pkt){
+    crcl2.reset();
+    for(int i = 0; i < LAYER2_SIZE-2; i++){
+        crcl2.add(pkt.layer2[i]);
+    }
+    uint16_t crcVal = crcl2.calc();
+    uint16_t crcValRecived = pkt.layer2[5] << 8 | pkt.layer2[6];
+    return crcVal == crcValRecived;
+}
+
+
 uint16_t Layer2::getMAC_Destinazione() const {
     return MAC_Destinazione;
 }

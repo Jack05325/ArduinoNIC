@@ -21,6 +21,7 @@ class Layer4{
         uint32_t getSeqNumber() const;
         uint16_t getPortaMittente() const;
         uint16_t getPortaDestinazione() const;
+        bool checkPacketRecived (const struct Pacchetto pkt);
     private:
         uint16_t windowSize = 0x1234;
         uint8_t flags = 0x12;

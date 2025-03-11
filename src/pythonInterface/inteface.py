@@ -3,27 +3,22 @@ import time
 import random
 import serial.tools
 import serial.tools.list_ports
+from socketANic import socket
 from Parametri import *
 from Flags import *
 
 
 
-# Configurazione porta seriale
-arduino = serial.Serial('/dev/cu.usbserial-120', baudrate=115200, timeout=200)
-
-def write_read(x):
-    arduino.reset_input_buffer()  # Pulisci il buffer
-    arduino.write(bytes(x , 'utf-8'))  # Aggiungi terminatore
-    data = arduino.readline()
-    return data
+socket = socket("192.168.0.1", "8080", serial.Serial('/dev/cu.debug-console', baudrate=115200, timeout=2))
 
 while True:
-    IP_DESTINAZIONE = input("inserisci l'ip di destinazione (192.168.1.1): ")
-    TTL = int(input("inserisci il TTL: "))
-    PORTA_DESTINAZIONE = int(input("inserisci la porta di destinazione: "))
-    PORTA_MITTENTE = random.randint(0, 2**16-1)
+    IP_DESTINAZIONE = input("inserisci l'ip di destinazione (Es: 192.168.1.1): ")
+    #TTL = int(input("inserisci il TTL: "))
+    PORTA_DESTINAZIONE = input("inserisci la porta di destinazione: ")
+    #PORTA_MITTENTE = random.randint(0, 2**16-1)
     DATI = input("inserisci i dati: ")
-    ricevuto = write_read(f"{IP_DESTINAZIONE}|{TTL}|{PORTA_DESTINAZIONE}|{PORTA_MITTENTE}|{DATI}")
+    
+    ricevuto = socket.sendData(IP_DESTINAZIONE, PORTA_DESTINAZIONE, DATI)
     print(ricevuto)
 
     

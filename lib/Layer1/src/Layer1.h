@@ -3,7 +3,10 @@
 
 #include "Arduino.h"
 #include "StackArray.h"
-
+#include "Layer1.h"
+#include "Layer2.h"
+#include "Layer3.h"
+#include "Layer4.h"
 
 class Layer1 {
     public:
@@ -13,7 +16,8 @@ class Layer1 {
         void inviaFrame(StackArray<Pacchetto> &stackPacchettiDaInviare, int numeroPacchettiDaInviare, int delay); //*Invia un numero di pacchetti specificato con un delay(in microsecondi) tra un pacchetto e l'altro
         bool isLineaLibera();
 
-        Pacchetto riceviFrame(Pacchetto SimPacchetto);
+        //Pacchetto riceviFrame(Pacchetto SimPacchetto);
+        Pacchetto riceviFrame();
 
         void setTempoPerBit(int tempo);
         int getTempoPerBit();
@@ -28,6 +32,9 @@ class Layer1 {
         int getRXPin();
 
         uint16_t getPreambolo();
+
+        bool checkPacchettoRicevuto(const Pacchetto pkt, Layer2 *layer2, Layer3 *layer3, Layer4 *layer4);
+
     private:
         void transmitLayer(const uint8_t *layer, size_t size);
         uint16_t preambolo = 0xAAAA;

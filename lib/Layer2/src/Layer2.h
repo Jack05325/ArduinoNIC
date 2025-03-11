@@ -19,6 +19,8 @@ class Layer2 {
         uint8_t getProtocolType() const;
         void setProtocolType(uint8_t type);
 
+        bool checkPacketRecived (const struct Pacchetto pkt);
+
     private:
         uint16_t MAC_Destinazione = 0x1234; 
         uint16_t MAC_Mittente = 0x1234;

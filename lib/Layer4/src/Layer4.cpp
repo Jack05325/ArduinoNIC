@@ -62,6 +62,16 @@ void Layer4::incapsulaDati(struct Pacchetto &pkt)
     Serial.println();*/
 }
 
+bool Layer4::checkPacketRecived(Pacchetto pkt){
+    crcl4.reset();
+    for(int i = 0; i < LAYER4_SIZE-2; i ++){
+        crcl4.add(pkt.layer4[i]);
+    }
+    uint16_t crcVal = crcl4.calc();
+    uint16_t crcValRecived = pkt.layer4[15] << 8 | pkt.layer4[16];
+    return crcVal == crcValRecived;
+}
+
 
 //Set e Get
 void Layer4::setWindowSize(uint16_t size) {

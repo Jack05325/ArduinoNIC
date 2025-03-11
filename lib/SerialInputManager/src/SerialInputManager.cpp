@@ -18,9 +18,12 @@ struct Pacchetto {
   uint8_t layer1[LAYER1_SIZE];
 };
 
-SerialInputManager::SerialInputManager(long baudRate, int timeout) {
-    //Serial.begin(baudRate);
-    //Serial.setTimeout(timeout);
+SerialInputManager::SerialInputManager() {
+
+}
+
+void SerialInputManager::begin(Print* serial){
+    _Serial = serial;
 }
 
 void SerialInputManager::handleInput(String inputBuffer, StackArray<Pacchetto>* stackPacchetti, Layer3 *layer3, Layer4 *layer4){
@@ -29,14 +32,14 @@ void SerialInputManager::handleInput(String inputBuffer, StackArray<Pacchetto>* 
     //Serial.println(inputBuffer);
     splitter = new StringSplitter(inputBuffer, '|', 5);    
     parseInputBuffer(stackPacchetti, splitter, layer3, layer4);
-    Serial.println(stackPacchetti->count());
+    _Serial->println(stackPacchetti->count());
 }
-
+//TODO: Sistemare il parsing dei dati perché sarà in parte gestiono dalla interfaccia seriale
 void SerialInputManager::parseInputBuffer(StackArray<Pacchetto> *stackPacchetti ,StringSplitter *splitter, Layer3* layer3, Layer4 *layer4){
     String IP_Dest = splitter->getItemAtIndex(0);
     int length = (16 + splitter->getItemAtIndex(4).length() - 1) / 16;    
-    Serial.print("L 5: ");
-    Serial.println(length);
+    _Serial->print("L 5: ");
+    _Serial->println(length);
     Pacchetto pktTmp;
 
     //!Creo lo stack di pacchetti inserendo solo i dati, poichè il layer 3 e 4 sono uguali per tutti i pacchetti e lo fa nel main --> possibile modifica parlare con il prof

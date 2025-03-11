@@ -20,6 +20,7 @@ public:
     uint8_t getTTL() const;
     void setTTL(uint8_t ttl);
 
+    bool checkPacketRecived(const struct Pacchetto pkt);
 private:
     uint8_t IP_Destinazione[4] = {0, 0, 0, 0};
     uint8_t IP_Mittente[4]     = {0, 0, 0, 0};

@@ -46,6 +46,16 @@ void Layer3::incapsulaDati(struct Pacchetto& pkt) {
     Serial.println();*/
 }
 
+bool Layer3::checkPacketRecived(const struct Pacchetto pkt) {
+    crcl3.reset();
+    for (int i = 0; i < LAYER3_SIZE-2; ++i) {
+        crcl3.add(pkt.layer3[i]);
+    }
+    uint16_t crcVal = crcl3.calc();
+    uint16_t crcValRecived = pkt.layer3[9] << 8 | pkt.layer3[10];
+    return crcVal == crcValRecived;
+}
+
 const uint8_t* Layer3::getIP_Destinazione() const {
     return IP_Destinazione;
 }
