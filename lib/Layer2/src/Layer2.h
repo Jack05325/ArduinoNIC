@@ -10,11 +10,11 @@ class Layer2 {
         Layer2();
         void incapsulaDati(struct Pacchetto &pkt);
 
-        uint16_t getMAC_Destinazione() const;
-        void setMAC_Destinazione(uint16_t mac);
+        const uint8_t* getMAC_Destinazione() const;
+        void setMAC_Destinazione(const uint8_t *mac);
 
-        uint16_t getMAC_Mittente() const;
-        void setMAC_Mittente(uint16_t mac);
+        const uint8_t* getMAC() const;
+        void setMAC(const uint8_t *mac);
 
         uint8_t getProtocolType() const;
         void setProtocolType(uint8_t type);
@@ -22,8 +22,8 @@ class Layer2 {
         bool checkPacketRecived (const struct Pacchetto pkt);
 
     private:
-        uint16_t MAC_Destinazione = 0x1234; 
-        uint16_t MAC_Mittente = 0x1234;
+        uint8_t MAC_Destinazione[2] = {0x00, 0x00}; 
+        uint8_t MAC[2] = {0x00, 0x00};
         uint8_t protocolType = 0x12;
         CRC16 crcl2;
 };

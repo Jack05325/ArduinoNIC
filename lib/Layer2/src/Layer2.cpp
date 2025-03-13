@@ -19,12 +19,12 @@ Layer2::Layer2() {
 }
 
 void Layer2::incapsulaDati(struct Pacchetto &pkt){
-    pkt.layer2[0] = MAC_Destinazione >> 8;
-    pkt.layer2[1] = (MAC_Destinazione << 8) >> 8;
+    pkt.layer2[0] = MAC_Destinazione[0];
+    pkt.layer2[1] = MAC_Destinazione[1];
     //memcpy(pkt.layer2, &MAC_Destinazione, 2);
 
-    pkt.layer2[2] = MAC_Mittente >> 8;
-    pkt.layer2[3] = (MAC_Mittente << 8) >> 8;
+    pkt.layer2[2] = MAC[0];
+    pkt.layer2[3] = MAC[1];
     //memcpy(pkt.layer2 + 2, &MAC_Mittente, 2);
 
     pkt.layer2[4] = protocolType;
@@ -56,20 +56,20 @@ bool Layer2::checkPacketRecived(const struct Pacchetto pkt){
 }
 
 
-uint16_t Layer2::getMAC_Destinazione() const {
+const uint8_t* Layer2::getMAC_Destinazione() const {
     return MAC_Destinazione;
 }
 
-void Layer2::setMAC_Destinazione(uint16_t macDestinazione) {
-    MAC_Destinazione = macDestinazione;
+void Layer2::setMAC_Destinazione(const uint8_t *mac) {
+    memcpy(MAC, mac, 6);
 }
 
-uint16_t Layer2::getMAC_Mittente() const {
-    return MAC_Mittente;
+const uint8_t* Layer2::getMAC() const {
+    return MAC;
 }
 
-void Layer2::setMAC_Mittente(uint16_t macMittente) {
-    MAC_Mittente = macMittente;
+void Layer2::setMAC(const uint8_t *mac) {
+    memcpy(MAC, mac, 6);
 }
 
 uint8_t Layer2::getProtocolType() const {

@@ -13,6 +13,7 @@ const uint8_t LAYER3_SIZE = 11;
 const uint8_t LAYER2_SIZE = 7;
 const uint8_t LAYER1_SIZE = 2;
 
+
 struct Pacchetto{
   uint8_t dati[DATA_SIZE];
   uint8_t layer4[LAYER4_SIZE];
@@ -22,7 +23,7 @@ struct Pacchetto{
 };
 
 
-StackArray<Pacchetto> stackPacchetti;
+StackArray<Pacchetto> stackPacchettiRicevuti;
 StackArray<Pacchetto> stackPacchettiDaInviare;
 
 Layer4 layer4;
@@ -32,13 +33,11 @@ Layer1 layer1;
 
 SerialInputManager sim;
 
-
-
 void setup()
 {
   Serial.begin(115200);
-  sim.begin(&Serial);
-  stackPacchetti.setPrinter(Serial);
+  sim.begin(&Serial, &layer3, &layer4);
+  stackPacchettiRicevuti.setPrinter(Serial);
   stackPacchettiDaInviare.setPrinter(Serial);
 }
 
@@ -60,16 +59,9 @@ void loop()
     }
   }
   
-  Serial.readBytes(buffer, 100);
-  Serial.println(buffer);
-  
-  sim.handleInput(buffer, &stackPacchetti, &layer3, &layer4);
-  
-  memset(buffer, 0, sizeof(buffer));
-  //handleUDP();
-  
-  Serial.clearWriteError();
-  Serial.flush();
+  if (Serial.available() > 0){
+    sim.handleInput(&stackPacchettiDaInviare);
+  }
 }
 
 

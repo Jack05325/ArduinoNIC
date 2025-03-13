@@ -17,13 +17,16 @@ public:
     const uint8_t* getIP_Mittente() const;
     void setIP_Mittente(uint8_t* ip);
 
+    const uint8_t* getIP() const;
+    void setIP(uint8_t* ip);
+    
     uint8_t getTTL() const;
     void setTTL(uint8_t ttl);
 
     bool checkPacketRecived(const struct Pacchetto pkt);
 private:
     uint8_t IP_Destinazione[4] = {0, 0, 0, 0};
-    uint8_t IP_Mittente[4]     = {0, 0, 0, 0};
+    uint8_t IP[4]     = {0, 0, 0, 0};
     uint8_t TTL                = 0x00;
     CRC16 crcl3;
 };
